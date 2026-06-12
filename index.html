@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrandGPT - AI Branding Suite</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      background-image:
+        radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 52% 99%, hsla(355, 98%, 61%, 0.15) 0px, transparent 50%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+   .app {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      max-width: 720px;
+      width: 100%;
+      padding: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+   .header { text-align: center; margin-bottom: 40px; }
+   .logo {
+      font-size: 42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+   .tagline { color: #94a3b8; font-size: 15px; }
+   .input-group { margin-bottom: 24px; }
+    label {
+      display: block;
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 2px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      color: #f1f5f9;
+      resize: none;
+      transition: all 0.3s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #60a5fa;
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
+    }
+    textarea::placeholder { color: #64748b; }
+   .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+    }
+    button {
+      padding: 16px 32px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+   .btn-primary {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      color: white;
+    }
+   .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(96, 165, 250, 0.4);
+    }
+   .btn-primary:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
+   .btn-secondary {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      display: none;
+    }
+   .btn-secondary:hover {
+      background: rgba(16, 185, 129, 0.3);
+      transform: translateY(-2px);
+    }
+   .result {
+      margin-top: 32px;
+      padding: 28px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 16px;
+      display: none;
+    }
+   .result.show { display: block; animation: slideUp 0.4s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+   .result-content {
+      color: #e2e8f0;
+      line-height: 1.8;
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+   .result-content strong {
+      color: #f1f5f9;
+      font-weight: 600;
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+   .loader {
+      text-align: center;
+      color: #60a5fa;
+      padding: 40px 0;
+    }
+   .spinner {
+      border: 3px solid rgba(96, 165, 250, 0.2);
+      border-top: 3px solid #60a5fa;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+   .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo">⚡ BrandGPT</div>
+      <p class="tagline">Instant Brand Names, Taglines & Pitches</p>
+    </div>
+
+    <div class="input-group">
+      <label>Describe Your Business Idea</label>
+      <textarea id="prompt" placeholder="Example: Organic protein bars for gym beginners who hate chalky taste and want clean ingredients"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="generate()" id="genBtn">
+        <span>✨</span>
+        <span>Generate Brand Kit</span>
+      </button>
+      <button class="btn-secondary" onclick="downloadPDF()" id="pdfBtn">
+        <span>📄</span>
+        <span>PDF</span>
+      </button>
+    </div>
+
+    <div class="result" id="resultBox">
+      <div class="result-content" id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    let lastResult = '';
+    let lastPrompt = '';
+
+    async function generate() {
+      const prompt = document.getElementById('prompt').value.trim();
+      const btn = document.getElementById('genBtn');
+      const resultBox = document.getElementById('resultBox');
+      const result = document.getElementById('result');
+      const pdfBtn = document.getElementById('pdfBtn');
+
+      if (!prompt) {
+        alert('Please enter your business description first');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Generating...</span>';
+      resultBox.classList.add('show');
+      result.innerHTML = '<div class="loader"><div class="spinner"></div><div>Crafting your brand identity...</div></div>';
+      pdfBtn.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok ||!data.success) {
+          throw new Error(data.error || data.message || 'Failed to generate');
+        }
+
+        lastResult = data.text;
+        lastPrompt = prompt;
+
+        const formatted = data.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        result.innerHTML = formatted;
+        pdfBtn.style.display = 'flex';
+
+      } catch (err) {
+        result.innerHTML = `<div class="error"><strong>Error:</strong> ${err.message}</div>`;
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span><span>Generate Brand Kit</span>';
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, 210, 297, 'F');
+
+      doc.setFontSize(24);
+      doc.setTextColor(96, 165, 250);
+      doc.text('⚡ BrandGPT', 105, 25, { align: 'center' });
+
+      doc.setFontSize(11);
+      doc.setTextColor(148, 163, 184);
+      doc.text('AI-Generated Brand Identity Kit', 105, 33, { align: 'center' });
+
+      doc.setDrawColor(96, 165, 250);
+      doc.line(20, 40, 190, 40);
+
+      doc.setFontSize(10);
+      doc.setTextColor(226, 232, 240);
+      doc.text('Business Description:', 20, 50);
+      const promptLines = doc.splitTextToSize(lastPrompt, 170);
+      doc.text(promptLines, 20, 57);
+
+      doc.setFontSize(11);
+      doc.setTextColor(241, 245, 249);
+      const cleanText = lastResult.replace(/\*\*/g, '');
+      const contentLines = doc.splitTextToSize(cleanText, 170);
+      doc.text(contentLines, 20, 75);
+
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Generated by BrandGPT | Powered by GPT-4o', 105, 285, { align: 'center' });
+
+      doc.save(`BrandGPT-${Date.now()}.pdf`);
+    }
+
+    document.getElementById('prompt').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) generate();
+    });
+  </script>
+</body>
+</html>
