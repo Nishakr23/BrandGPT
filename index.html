@@ -289,14 +289,14 @@ Include: 5 brand names, tagline, color palette with hex codes, font pairing, and
     lastIndustry = industry;
     lastAudience = audience;
 
-    // COMPLETE FIX: Colon, dash, star sab hata do
+    
     let formatted = data.text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **Bold** 
-      .replace(/\*(.*?)\*/g, '$1')  // *italic* hatao
-      .replace(/^\s*[-•]\s*/gm, '')  // Dash bullet hatao
-      .replace(/^\s*--+\s*$/gm, '')  // -- separator line hatao
-      .replace(/:\s*(#[0-9A-Fa-f]{6})/g, ' $1')  // : #HEX ko space #HEX banao
-      .replace(/(#[0-9A-Fa-f]{6})/g, '$1 <span class="color-swatch" style="background:$1"></span>')  // Color box
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')   
+      .replace(/\*(.*?)\*/g, '$1')  
+      .replace(/^\s*[-•]\s*/gm, '')  
+      .replace(/^\s*--+\s*$/gm, '')  
+      .replace(/:\s*(#[0-9A-Fa-f]{6})/g, ' $1') 
+      .replace(/(#[0-9A-Fa-f]{6})/g, '$1 <span class="color-swatch" style="background:$1"></span>') 
       .replace(/\n\n+/g, '<br><br>')
       .replace(/\n/g, '<br>');
 
