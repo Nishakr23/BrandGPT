@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ BrandGPT - Your AI Creative Director
+# ⚡ BrandGPT - AI Branding Suite
 
 ### *Transform Business Ideas into Complete Brand Identities in 10 Seconds*
 
