@@ -49,9 +49,8 @@
       font-weight: 500;
       margin-bottom: 10px;
     }
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      height: 120px;
       padding: 16px;
       background: rgba(15, 23, 42, 0.6);
       border: 2px solid rgba(148, 163, 184, 0.2);
@@ -59,16 +58,25 @@
       font-size: 15px;
       font-family: 'Inter', sans-serif;
       color: #f1f5f9;
-      resize: none;
       transition: all 0.3s;
     }
-    textarea:focus {
+    textarea {
+      height: 120px;
+      resize: none;
+    }
+    textarea:focus, input[type="text"]:focus {
       outline: none;
       border-color: #60a5fa;
       background: rgba(15, 23, 42, 0.8);
       box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
     }
-    textarea::placeholder { color: #64748b; }
+    textarea::placeholder, input::placeholder { color: #64748b; }
+   .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
    .actions {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -128,15 +136,27 @@
       color: #e2e8f0;
       line-height: 1.8;
       font-size: 15px;
-      white-space: pre-wrap;
     }
    .result-content strong {
       color: #f1f5f9;
       font-weight: 600;
       display: block;
-      margin-top: 16px;
-      margin-bottom: 8px;
-      font-size: 16px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      font-size: 17px;
+    }
+   .result-content strong:first-child {
+      margin-top: 0;
+    }
+   .color-swatch {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      vertical-align: middle;
+      margin-left: 10px;
+      margin-right: 8px;
     }
    .loader {
       text-align: center;
@@ -164,18 +184,33 @@
       border-radius: 12px;
       margin-top: 16px;
     }
+    @media (max-width: 640px) {
+      .input-row { grid-template-columns: 1fr; }
+      .app { padding: 32px 24px; }
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="header">
       <div class="logo">⚡ BrandGPT</div>
-      <p class="tagline">Instant Brand Names, Taglines & Pitches</p>
+      <p class="tagline">AI Copilot-Powered Branding with Work IQ Context</p>
     </div>
 
     <div class="input-group">
       <label>Describe Your Business Idea</label>
       <textarea id="prompt" placeholder="Example: Organic protein bars for gym beginners who hate chalky taste and want clean ingredients"></textarea>
+    </div>
+
+    <div class="input-row">
+      <div>
+        <label>Industry *</label>
+        <input type="text" id="industry" placeholder="e.g. Fitness, EdTech, SaaS">
+      </div>
+      <div>
+        <label>Target Audience *</label>
+        <input type="text" id="audience" placeholder="e.g. Gen Z, SMBs, Parents">
+      </div>
     </div>
 
     <div class="actions">
@@ -197,52 +232,84 @@
   <script>
     let lastResult = '';
     let lastPrompt = '';
+    let lastIndustry = '';
+    let lastAudience = '';
 
-    async function generate() {
-      const prompt = document.getElementById('prompt').value.trim();
-      const btn = document.getElementById('genBtn');
-      const resultBox = document.getElementById('resultBox');
-      const result = document.getElementById('result');
-      const pdfBtn = document.getElementById('pdfBtn');
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  const industry = document.getElementById('industry').value.trim();
+  const audience = document.getElementById('audience').value.trim();
+  
+  const btn = document.getElementById('genBtn');
+  const resultBox = document.getElementById('resultBox');
+  const result = document.getElementById('result');
+  const pdfBtn = document.getElementById('pdfBtn');
 
-      if (!prompt) {
-        alert('Please enter your business description first');
-        return;
-      }
+  if (!prompt) {
+    alert('Please enter your business description first');
+    return;
+  }
 
-      btn.disabled = true;
-      btn.innerHTML = '<span>⏳</span><span>Generating...</span>';
-      resultBox.classList.add('show');
-      result.innerHTML = '<div class="loader"><div class="spinner"></div><div>Crafting your brand identity...</div></div>';
-      pdfBtn.style.display = 'none';
+  if (!industry || !audience) {
+    alert('Please fill Industry and Target Audience for Work IQ context');
+    return;
+  }
 
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
-        });
+  const enhancedPrompt = `Using Work IQ context: Generate a complete brand kit for a ${industry} business targeting ${audience}. Business idea: ${prompt}. 
 
-        const data = await res.json();
+Format rules:
+1. Use clear headings like "Brand Names:", "Tagline:", "Color Palette:", "Font Pairing:"
+2. Do NOT use colons before hex codes. Write like "Green Energy #4CAF50"
+3. Do NOT use -- or --- separators
+4. Do NOT use asterisks for bold
 
-        if (!res.ok ||!data.success) {
-          throw new Error(data.error || data.message || 'Failed to generate');
-        }
+Include: 5 brand names, tagline, color palette with hex codes, font pairing, and 30-sec pitch script.`;
 
-        lastResult = data.text;
-        lastPrompt = prompt;
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span><span>Generating...</span>';
+  resultBox.classList.add('show');
+  result.innerHTML = '<div class="loader"><div class="spinner"></div><div>Crafting your brand identity with Work IQ...</div></div>';
+  pdfBtn.style.display = 'none';
 
-        const formatted = data.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        result.innerHTML = formatted;
-        pdfBtn.style.display = 'flex';
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: enhancedPrompt })
+    });
 
-      } catch (err) {
-        result.innerHTML = `<div class="error"><strong>Error:</strong> ${err.message}</div>`;
-      }
+    const data = await res.json();
 
-      btn.disabled = false;
-      btn.innerHTML = '<span>✨</span><span>Generate Brand Kit</span>';
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || data.message || 'Failed to generate');
     }
+
+    lastResult = data.text;
+    lastPrompt = prompt;
+    lastIndustry = industry;
+    lastAudience = audience;
+
+    // COMPLETE FIX: Colon, dash, star sab hata do
+    let formatted = data.text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **Bold** 
+      .replace(/\*(.*?)\*/g, '$1')  // *italic* hatao
+      .replace(/^\s*[-•]\s*/gm, '')  // Dash bullet hatao
+      .replace(/^\s*--+\s*$/gm, '')  // -- separator line hatao
+      .replace(/:\s*(#[0-9A-Fa-f]{6})/g, ' $1')  // : #HEX ko space #HEX banao
+      .replace(/(#[0-9A-Fa-f]{6})/g, '$1 <span class="color-swatch" style="background:$1"></span>')  // Color box
+      .replace(/\n\n+/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    result.innerHTML = formatted;
+    pdfBtn.style.display = 'flex';
+
+  } catch (err) {
+    result.innerHTML = `<div class="error"><strong>Error:</strong> ${err.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>✨</span><span>Generate Brand Kit</span>';
+}
 
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
@@ -253,30 +320,35 @@
 
       doc.setFontSize(24);
       doc.setTextColor(96, 165, 250);
-      doc.text('⚡ BrandGPT', 105, 25, { align: 'center' });
+      doc.text('BrandGPT', 105, 25, { align: 'center' });
 
       doc.setFontSize(11);
       doc.setTextColor(148, 163, 184);
-      doc.text('AI-Generated Brand Identity Kit', 105, 33, { align: 'center' });
+      doc.text('AI-Generated Brand Identity Kit | Work IQ Grounded', 105, 33, { align: 'center' });
 
       doc.setDrawColor(96, 165, 250);
       doc.line(20, 40, 190, 40);
 
       doc.setFontSize(10);
       doc.setTextColor(226, 232, 240);
-      doc.text('Business Description:', 20, 50);
+      doc.text('Business Context:', 20, 50);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Industry: ${lastIndustry} | Audience: ${lastAudience}`, 20, 57);
+      
+      doc.setTextColor(226, 232, 240);
+      doc.text('Business Description:', 20, 67);
       const promptLines = doc.splitTextToSize(lastPrompt, 170);
-      doc.text(promptLines, 20, 57);
+      doc.text(promptLines, 20, 74);
 
       doc.setFontSize(11);
       doc.setTextColor(241, 245, 249);
-      const cleanText = lastResult.replace(/\*\*/g, '');
+      const cleanText = lastResult.replace(/\*\*/g, '').replace(/[-•]\s*/g, '');
       const contentLines = doc.splitTextToSize(cleanText, 170);
-      doc.text(contentLines, 20, 75);
+      doc.text(contentLines, 20, 90);
 
       doc.setFontSize(8);
       doc.setTextColor(100, 116, 139);
-      doc.text('Generated by BrandGPT | Powered by GPT-4o', 105, 285, { align: 'center' });
+      doc.text('Generated by BrandGPT | Built with GitHub Copilot + Work IQ', 105, 285, { align: 'center' });
 
       doc.save(`BrandGPT-${Date.now()}.pdf`);
     }
