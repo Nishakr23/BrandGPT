@@ -177,4 +177,5 @@ cp .env.example .env
 npm start
 
 # 5. Open http://localhost:3000
-⚠️ Security Note: API tokens are not committed - industry best practice per hackathon rules. Full working demo in video. Use demo data only.
+
+⚠️ Note for Judges: API tokens are not committed for security reasons - industry best practice. Full working demo is in the video submission above. All code is complete and reviewable. Use your own GitHub Models token to test locally.
