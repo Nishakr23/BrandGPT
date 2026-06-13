@@ -151,15 +151,6 @@ This project showcases **AI-assisted creative development at its best** - Core r
 
 </div>
 
-**Key Moments:**
-- `0:00` - Problem: Generic branding vs Market-grounded branding
-- `0:20` - Live input + Foundry IQ retrieval in action
-- `1:00` - Brand IQ Score breakdown with cited sources  
-- `1:30` - PDF download + Copilot Chat showcase
-- `1:50` - Why this meets "Creative Agent" criteria
-
----
-
 ## 🚀 Run Locally
 
 ### Prerequisites
