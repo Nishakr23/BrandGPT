@@ -145,7 +145,7 @@ This project showcases **AI-assisted creative development at its best** - Core r
 
 <div align="center">
 
-**[▶️ Watch 2-Min Demo Video](https://youtu.be/JoFGYlSZE88)**
+**[▶️ Watch 2-Min Demo Video](https://youtu.be/sBGZt3IOixU?si=4gshj23OlRFvtvXw)**
 
 *See BrandGPT use Foundry IQ to transform "AI fitness app for busy moms" into a 94/100 IQ Score brand in 10 seconds*
 
