@@ -4,7 +4,7 @@
 
 ### *Transform Business Ideas into Complete Brand Identities in 10 Seconds*
 
-[![Agent League Hackathon](https://img.shields.io/badge/Hackathon-Agent_League_2026-Creative_Apps-blue)](https://info.microsoft.com/Agents-League-Hackathon-Registration.html)
+[![Hackathon](https://img.shields.io/badge/Hackathon-Agent_League_2026-blue)](https://info.microsoft.com/Agents-League-Hackathon-Registration.html)
 [![Built with Copilot](https://img.shields.io/badge/Built%20with-GitHub%20Copilot-8A2BE2)](https://github.com/features/copilot)
 [![Powered by GPT-4o](https://img.shields.io/badge/AI-GPT--4o--mini_+_Microsoft_IQ-00A67E)](https://github.com/marketplace/models)
 
